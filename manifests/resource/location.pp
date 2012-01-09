@@ -3,6 +3,7 @@
 # This definition creates a new location entry within a virtual host
 #
 # Parameters:
+
 #   [*ensure*]      - Enables or disables the specified location (present|absent)
 #   [*vhost*]       - Defines the default vHost for this location entry to include with
 #   [*location*]    - Specifies the URI associated with this location entry
@@ -12,6 +13,9 @@
 #                     with nginx::resource::upstream
 #   [*ssl*]         - Indicates whether to setup SSL bindings for this location.
 #   [*try_files*]      - An array of file locations to try
+#   [*fastcgi*]        - location of fastcgi (host:port)
+#   [*fastcgi_params*] - optional alternative fastcgi_params file to use
+#   [*fastcgi_script*] - optional SCRIPT_FILE parameter
 #   [*option*]      - Reserved for future use
 #
 # Actions:
@@ -26,14 +30,17 @@
 #    vhost    => 'test2.local',
 #  }
 define nginx::resource::location(
-  $ensure      = present,
-  $vhost       = undef,
-  $www_root    = undef,
-  $index_files = ['index.html', 'index.htm', 'index.php'],
-  $proxy       = undef,
-  $ssl         = false,
+  $ensure         = present,
+  $vhost          = undef,
+  $www_root       = undef,
+  $index_files    = ['index.html', 'index.htm', 'index.php'],
+  $proxy          = undef,
+  $fastcgi        = undef,
+  $fastcgi_params = '/etc/nginx/fastcgi_params',
+  $fastcgi_script = undef,
+  $ssl            = false,
   $try_files      = undef,
-  $option      = undef,
+  $option         = undef,
   $location
 ) {
   File {
@@ -49,9 +56,11 @@ define nginx::resource::location(
     default  => file,
   }
 
-  # Use proxy template if $proxy is defined, otherwise use directory template.
+  # Use proxy or fastcgi template if defined, otherwise use directory
   if ($proxy != undef) {
     $content_real = template('nginx/vhost/vhost_location_proxy.erb')
+  } elsif ($fastcgi != undef) {
+    $content_real = template('nginx/vhost/vhost_location_fastcgi.erb')
   } else {
     $content_real = template('nginx/vhost/vhost_location_directory.erb')
   }
@@ -60,8 +69,8 @@ define nginx::resource::location(
   if ($vhost == undef) {
     fail('Cannot create a location reference without attaching to a virtual host')
   }
-  if (($www_root == undef) and ($proxy == undef)) {
-    fail('Cannot create a location reference without a www_root or proxy defined')
+  if (($www_root == undef) and ($proxy == undef) and ($fastcgi == undef)) {
+    fail('Cannot create a location reference without a www_root or proxy or fastcgi defined')
   }
   if (($www_root != undef) and ($proxy != undef)) {
     fail('Cannot define both directory and proxy in a virtual host')
