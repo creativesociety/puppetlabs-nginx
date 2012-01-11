@@ -28,7 +28,7 @@ class nginx::params {
 
   $nx_proxy_redirect          = off
   $nx_proxy_set_header        = [
-    'Host $host', 'X-Real-IP $remote_addr',
+    'Host $http_host', 'X-Real-IP $remote_addr',
     'X-Forwarded-For $proxy_add_x_forwarded_for',
   ]
 
