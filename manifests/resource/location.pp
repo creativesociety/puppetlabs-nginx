@@ -41,6 +41,7 @@ define nginx::resource::location(
   $ssl            = false,
   $try_files      = undef,
   $option         = undef,
+  $options        = undef,
   $location
 ) {
   File {
@@ -61,6 +62,8 @@ define nginx::resource::location(
     $content_real = template('nginx/vhost/vhost_location_proxy.erb')
   } elsif ($fastcgi != undef) {
     $content_real = template('nginx/vhost/vhost_location_fastcgi.erb')
+  } elsif ($options != undef) {
+    $content_real = template('nginx/vhost/vhost_location_options.erb')
   } else {
     $content_real = template('nginx/vhost/vhost_location_directory.erb')
   }
@@ -69,7 +72,7 @@ define nginx::resource::location(
   if ($vhost == undef) {
     fail('Cannot create a location reference without attaching to a virtual host')
   }
-  if (($www_root == undef) and ($proxy == undef) and ($fastcgi == undef)) {
+  if (($www_root == undef) and ($proxy == undef) and ($fastcgi == undef) and ($options == undef)) {
     fail('Cannot create a location reference without a www_root or proxy or fastcgi defined')
   }
   if (($www_root != undef) and ($proxy != undef)) {
