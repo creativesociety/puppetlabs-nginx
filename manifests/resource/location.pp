@@ -73,11 +73,20 @@ define nginx::resource::location(
     content => $content_real,
   }
 
+  file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-599-${name}":
+    ensure  => $ensure_real,
+    content => template('nginx/vhost/vhost_location_footer.erb')
+  }
+
   ## Only create SSL Specific locations if $ssl is true.
   if ($ssl == 'true') {
     file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-800-${name}-ssl":
       ensure  => $ensure_real,
       content => $content_real,
+    }
+    file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-899-${name}":
+      ensure  => $ensure_real,
+      content => template('nginx/vhost/vhost_location_footer.erb')
     }
   }
 }
