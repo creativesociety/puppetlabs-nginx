@@ -1,0 +1,10 @@
+<% if @description -%>
+  # <%= description %>
+<% end -%>
+<% if @condition -%>
+  if (<%= condition %>) {
+<% end -%>
+    rewrite <%= regex %> <%= replacement %> <%= flag %>;
+<% if @condition -%>
+  }
+<% end -%>
