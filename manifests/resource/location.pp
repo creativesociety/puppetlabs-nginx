@@ -68,23 +68,23 @@ define nginx::resource::location(
   }
 
   ## Create stubs for vHost File Fragment Pattern
-  file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-500-${name}":
+  file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-500-${name}-000":
     ensure  => $ensure_real,
     content => $content_real,
   }
 
-  file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-599-${name}":
+  file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-500-${name}-999":
     ensure  => $ensure_real,
     content => template('nginx/vhost/vhost_location_footer.erb')
   }
 
   ## Only create SSL Specific locations if $ssl is true.
   if ($ssl == 'true') {
-    file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-800-${name}-ssl":
+    file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-800-${name}-000-ssl":
       ensure  => $ensure_real,
       content => $content_real,
     }
-    file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-899-${name}":
+    file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-800-${name}-999-ssl":
       ensure  => $ensure_real,
       content => template('nginx/vhost/vhost_location_footer.erb')
     }

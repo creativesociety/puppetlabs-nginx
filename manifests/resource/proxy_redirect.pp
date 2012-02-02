@@ -47,14 +47,14 @@ define nginx::resource::proxy_redirect(
   $content_real = template('nginx/vhost/vhost_location_proxy_redirect.erb')
 
   ## Create stubs for vHost File Fragment Pattern
-  file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-550-${location}-${name}":
+  file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-500-${location}-500-${name}":
     ensure  => $ensure_real,
     content => $content_real,
   }
 
   ## Only create SSL Specific locations if $ssl is true.
   if ($ssl) {
-    file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-850-${location}-${name}-ssl":
+    file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-800-${location}-500-${name}-ssl":
       ensure  => $ensure_real,
       content => $content_real,
     }
