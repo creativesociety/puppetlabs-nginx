@@ -66,7 +66,7 @@ define nginx::resource::rewrite(
 
   ## rewrite fragment
   if $location_real {
-    file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-520-${location_real}-rewrite-${order}-${name}":
+    file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-500-${location_real}-200-rewrite-${order}-${name}":
       ensure  => $ensure_real,
       content => $content_real,
     }
@@ -81,7 +81,7 @@ define nginx::resource::rewrite(
   ## Only create SSL Specific fragment if $ssl is true.
   if $ssl {
     if $location_real {
-      file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-820-${location_real}-rewrite-${order}-${name}-ssl":
+      file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-800-${location_real}-200-rewrite-${order}-${name}-ssl":
         ensure  => $ensure_real,
         content => $content_real,
       }
