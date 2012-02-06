@@ -90,7 +90,7 @@ define nginx::resource::location(
   }
 
   ## Only create SSL Specific locations if $ssl is true.
-  if ($ssl == 'true') {
+  if ($ssl != false) {
     file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-800-${name}-000-ssl":
       ensure  => $ensure_real,
       content => $content_real,
