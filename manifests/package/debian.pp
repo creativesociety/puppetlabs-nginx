@@ -15,7 +15,7 @@
 # This class file is not called directly
 class nginx::package::debian {
 
-    if !defined(Package['nginx') {
+    if !defined(Package['nginx']) {
     package { 'nginx':
         ensure => present,
     }
