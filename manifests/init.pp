@@ -30,7 +30,10 @@
 # }
 class nginx {
 
-  class { 'stdlib': }
+
+  if !defined(Class['stdlib']) {
+    class { 'stdlib': }
+  }
 
   class { 'nginx::package':
     notify => Class['nginx::service'],
