@@ -98,7 +98,6 @@ define nginx::resource::vhost(
     fastcgi_params     => $fastcgi_params,
     fastcgi_script     => $fastcgi_script,
     try_files          => $try_files,
-    www_root           => $www_root,
     notify             => Class['nginx::service'],
   }
 
