@@ -52,7 +52,8 @@ define nginx::resource::vhost(
   $fastcgi_script     = undef,
   $index_files        = ['index.html', 'index.htm', 'index.php'],
   $www_root           = undef,
-  $try_files          = undef
+  $try_files          = undef,
+  $locations	      = undef
 ) {
 
   File {
@@ -101,6 +102,9 @@ define nginx::resource::vhost(
     notify             => Class['nginx::service'],
   }
 
+  if ($locations != undef) {
+    create_resources('nginx::resource::location', $locations)
+  }
   # Create a proper file close stub.
   file { "${nginx::config::nx_temp_dir}/nginx.d/${name}-699":
     ensure  => $ensure ? {
