@@ -1,5 +1,7 @@
-  location <%= location %> {
+location <%= location %> {
+    <% if www_root.to_s != 'undef' %>
     root  <%= www_root %>;
+    <% end -%>
     index <% index_files.each do |i| %> <%= i %> <% end %>;
 
     <% if try_files.to_s != 'undef' then %>
