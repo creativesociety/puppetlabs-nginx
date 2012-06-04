@@ -74,9 +74,6 @@ define nginx::resource::location(
   if ($vhost == undef) {
     fail('Cannot create a location reference without attaching to a virtual host')
   }
-  if (($www_root == undef) and ($proxy == undef) and ($fastcgi == undef) and ($options == undef)) {
-    fail('Cannot create a location reference without a www_root or proxy or fastcgi defined')
-  }
   if (($www_root != undef) and ($proxy != undef)) {
     fail('Cannot define both directory and proxy in a virtual host')
   }
