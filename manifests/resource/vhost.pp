@@ -43,7 +43,6 @@ define nginx::resource::vhost(
   $ipv6_listen_ip     = '::',
   $ipv6_listen_port   = '80',
   $server_names       = [],
-  $ssl                = false,
   $ssl_cert           = undef,
   $ssl_key            = undef,
   $proxy              = undef,
@@ -56,7 +55,7 @@ define nginx::resource::vhost(
   $www_root           = undef,
   $try_files          = undef,
   $locations          = undef,
-  $protocol           = 'both'
+  $protocol           = 'plain'
 ) {
 
   File {
@@ -71,34 +70,23 @@ define nginx::resource::vhost(
     warning('nginx: IPv6 support is not enabled or configured properly')
   }
 
-  # Check to see if SSL Certificates are properly defined.
-  if ($ssl == 'true') {
-    if ($ssl_cert == undef) or ($ssl_key == undef) {
-      fail('nginx: SSL certificate/key (ssl_cert/ssl_cert) and/or SSL Private must be defined and exist on the target system(s)')
-    }
-  }
-
   # Check protocol sanity
   if $protocol !~ /(ssl|plain|both)/ {
     fail("nginx: Invalid protocol ${protocol}")
   }
 
-  # Use the File Fragment Pattern to construct the configuration files.
-  # Create the base configuration file reference.
-  file { "${nginx::config::nx_temp_dir}/nginx.d/${name}-001":
-    ensure  => $ensure ? {
-      'absent' => absent,
-      default  => 'file',
-    },
-    content => template('nginx/vhost/vhost_header.erb'),
-    notify => Class['nginx::service'],
+  # Check to see if SSL Certificates are properly defined.
+  if ($protocol =~ /(ssl|both)/) {
+    if ($ssl_cert == undef) or ($ssl_key == undef) {
+      fail('nginx: SSL certificate/key (ssl_cert/ssl_cert) and/or SSL Private must be defined and exist on the target system(s)')
+    }
   }
 
   # Create the default location reference for the vHost
   nginx::resource::location {"${name}-default":
     ensure             => $ensure,
     vhost              => $name,
-    ssl                => $ssl,
+    protocol           => $protocol,
     location           => '/',
     proxy              => $proxy,
     proxy_read_timeout => $proxy_read_timeout,
@@ -112,8 +100,21 @@ define nginx::resource::vhost(
   if ($locations != undef) {
     create_resources('nginx::resource::location', $locations)
   }
-  # Create a proper file close stub.
-  if ($protocol == 'plain' or $protocol == 'both') {
+
+  # Create plain file stubs
+  if ($protocol =~ /(plain|both)/) {
+    # Use the File Fragment Pattern to construct the configuration files.
+    # Create the base configuration file reference.
+    file { "${nginx::config::nx_temp_dir}/nginx.d/${name}-001":
+      ensure  => $ensure ? {
+        'absent' => absent,
+        default  => 'file',
+      },
+      content => template('nginx/vhost/vhost_header.erb'),
+      notify => Class['nginx::service'],
+    }
+
+    # Create a proper file close stub.
     file { "${nginx::config::nx_temp_dir}/nginx.d/${name}-699":
       ensure  => $ensure ? {
         'absent' => absent,
@@ -125,10 +126,7 @@ define nginx::resource::vhost(
   }
 
   # Create SSL File Stubs if SSL is enabled
-  if ($protocol == 'ssl' or $protocol == 'both') {
-    if $ssl != 'true' {
-      fail("nginx: Protocol is set to ${protocol}, but SSL isn't enabled.")
-    }
+  if ($protocol =~ /(ssl|both)/) {
     file { "${nginx::config::nx_temp_dir}/nginx.d/${name}-700-ssl":
       ensure => $ensure ? {
         'absent' => absent,

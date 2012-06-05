@@ -40,7 +40,7 @@ define nginx::resource::location(
   $fastcgi            = undef,
   $fastcgi_params     = '/etc/nginx/fastcgi_params',
   $fastcgi_script     = undef,
-  $ssl                = false,
+  $protocol           = 'plain',
   $try_files          = undef,
   $option             = undef,
   $options            = undef,
@@ -78,14 +78,16 @@ define nginx::resource::location(
     fail('Cannot define both directory and proxy in a virtual host')
   }
 
-  ## Create stubs for vHost File Fragment Pattern
-  file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-500-${name}":
-    ensure  => $ensure_real,
-    content => $content_real,
+  if ($protocol =~ /(plain|both)/) {
+    ## Create stubs for vHost File Fragment Pattern
+    file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-500-${name}":
+      ensure  => $ensure_real,
+      content => $content_real,
+    }
   }
 
   ## Only create SSL Specific locations if $ssl is true.
-  if ($ssl == 'true') {
+  if ($protocol =~ /(ssl|both)/) {
     file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-800-${name}-ssl":
       ensure  => $ensure_real,
       content => $content_real,
