@@ -47,6 +47,7 @@ define nginx::resource::vhost(
   $ssl_cert           = undef,
   $ssl_key            = undef,
   $proxy              = undef,
+  $proxy_headers      = undef,
   $proxy_read_timeout = $nginx::params::nx_proxy_read_timeout,
   $fastcgi            = undef,
   $fastcgi_params     = '/etc/nginx/fastcgi_params',
