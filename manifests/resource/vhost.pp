@@ -55,7 +55,8 @@ define nginx::resource::vhost(
   $index_files        = ['index.html', 'index.htm', 'index.php'],
   $www_root           = undef,
   $try_files          = undef,
-  $locations	      = undef
+  $locations          = undef,
+  $protocol           = 'both'
 ) {
 
   File {
@@ -75,6 +76,11 @@ define nginx::resource::vhost(
     if ($ssl_cert == undef) or ($ssl_key == undef) {
       fail('nginx: SSL certificate/key (ssl_cert/ssl_cert) and/or SSL Private must be defined and exist on the target system(s)')
     }
+  }
+
+  # Check protocol sanity
+  if $protocol !~ /(ssl|plain|both)/ {
+    fail("nginx: Invalid protocol ${protocol}")
   }
 
   # Use the File Fragment Pattern to construct the configuration files.
@@ -107,17 +113,22 @@ define nginx::resource::vhost(
     create_resources('nginx::resource::location', $locations)
   }
   # Create a proper file close stub.
-  file { "${nginx::config::nx_temp_dir}/nginx.d/${name}-699":
-    ensure  => $ensure ? {
-      'absent' => absent,
-      default  => 'file',
-    },
-    content => template('nginx/vhost/vhost_footer.erb'),
-    notify  => Class['nginx::service'],
+  if ($protocol == 'plain' or $protocol == 'both') {
+    file { "${nginx::config::nx_temp_dir}/nginx.d/${name}-699":
+      ensure  => $ensure ? {
+        'absent' => absent,
+        default  => 'file',
+      },
+      content => template('nginx/vhost/vhost_footer.erb'),
+      notify  => Class['nginx::service'],
+    }
   }
 
   # Create SSL File Stubs if SSL is enabled
-  if ($ssl == 'true') {
+  if ($protocol == 'ssl' or $protocol == 'both') {
+    if $ssl != 'true' {
+      fail("nginx: Protocol is set to ${protocol}, but SSL isn't enabled.")
+    }
     file { "${nginx::config::nx_temp_dir}/nginx.d/${name}-700-ssl":
       ensure => $ensure ? {
         'absent' => absent,
