@@ -1,8 +1,8 @@
 server {
-  <%- if ipv6_enable && ipv6_enable != 'false' && @ipaddress6 -%>
+  <%- if ipv6_enable && ipv6_enable != 'false' && @ipaddress6 && listen_ip == '*' -%>
   listen [::]:443;
   <%- else -%>
-  listen 443;
+  listen <%= listen_ip %>:443;
   <%- end -%>
   server_name  <%= name %>;
 
