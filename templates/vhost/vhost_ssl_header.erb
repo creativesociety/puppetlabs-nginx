@@ -1,6 +1,9 @@
 server {
-  listen       443;
-  <% if ipv6_enable && ipv6_enable!='false' && has_variable?("ipaddress6") %>listen [<%= ipv6_listen_ip %>]:443 ipv6only=on;<% end %>
+  <%- if ipv6_enable && ipv6_enable != 'false' && @ipaddress6 -%>
+  listen [::]:443;
+  <%- else -%>
+  listen 443;
+  <%- end -%>
   server_name  <%= name %>;
 
   ssl on;
