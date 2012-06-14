@@ -88,6 +88,7 @@ define nginx::resource::vhost(
     vhost              => $name,
     protocol           => $protocol,
     location           => '/',
+    index_files        => $index_files,
     proxy              => $proxy,
     proxy_read_timeout => $proxy_read_timeout,
     fastcgi            => $fastcgi,
