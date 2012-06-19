@@ -1,0 +1,12 @@
+  location <%= location %> {
+    <% options.each do |option, value| -%>
+    <% if value.kind_of?(Array) %>
+    <% value.each do |line| -%>
+    <%= option %> <%= line %>;
+    <% end %>
+    <% else %>
+    <%= option %> <%= value %>;
+    <% end %>
+    <% end %>
+  }
+  
