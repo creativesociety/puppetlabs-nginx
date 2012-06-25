@@ -31,9 +31,11 @@
 class nginx {
 
 
-  if !defined(Class['stdlib']) {
-    class { 'stdlib': }
-  }
+  #if !defined(Class['stdlib']) {
+  #  class { 'stdlib': }
+  #}
+  include stdlib
+
 
   class { 'nginx::package':
     notify => Class['nginx::service'],

@@ -79,32 +79,27 @@ define nginx::resource::location(
   }
 
   ## Check for various error condtiions
-  if ($vhost == undef) {
-    fail('Cannot create a location reference without attaching to a virtual host')
-  }
+  #if ($vhost == undef) {
+  #  fail('Cannot create a location reference without attaching to a virtual host')
+  #}
 
-  if (($www_root != undef) and ($proxy != undef)) {
-    fail('Cannot define both directory and proxy in a virtual host')
-  }
+  #if (($www_root != undef) and ($proxy != undef)) {
+  #  fail('Cannot define both directory and proxy in a virtual host')
+  #}
 
   if ($protocol =~ /(plain|both)/) {
-    ## Create stubs for vHost File Fragment Pattern
-    file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-500-${name}":
-      ensure  => $ensure_real,
-      content => $content_real,
-    }
 
   $location_config = [
     $alias_root ? { undef => 0, default => 1},
     $www_root   ? { undef => 0, default => 1},
     $proxy      ? { undef => 0, default => 1}
   ]
-  if $location_config[0] + $location_config[1] + $location_config[2] > 1 {
-    fail('Cannot define both directory (www_root or alias_root) and proxy in a virtual host')
-  }
-  if $location_config[0] + $location_config[1] + $location_config[2] == 0 {
-    fail('Cannot create a location reference without a www_root, alias_root, or proxy defined')
-  }
+  #if $location_config[0] + $location_config[1] + $location_config[2] > 1 {
+  #  fail('Cannot define both directory (www_root or alias_root) and proxy in a virtual host')
+  #}
+  #if $location_config[0] + $location_config[1] + $location_config[2] == 0 {
+  #  fail('Cannot create a location reference without a www_root, alias_root, or proxy defined')
+  #}
 
   ## Create stubs for vHost File Fragment Pattern
   file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-500-${name}-000":
@@ -112,20 +107,16 @@ define nginx::resource::location(
     content => $content_real,
   }
 
-  file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-500-${name}-999":
-    ensure  => $ensure_real,
-    content => template('nginx/vhost/vhost_location_footer.erb')
-  }
-
   ## Only create SSL Specific locations if $ssl is true.
-  if ($ssl == 'true') {
-    file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-800-${name}-000-ssl":
-      ensure  => $ensure_real,
-      content => $content_real,
-    }
-    file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-800-${name}-999-ssl":
-      ensure  => $ensure_real,
-      content => template('nginx/vhost/vhost_location_footer.erb')
-    }
+  #if ($ssl == 'true') {
+  #  file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-800-${name}-000-ssl":
+  #    ensure  => $ensure_real,
+  #    content => $content_real,
+  #  }
+  #  file {"${nginx::config::nx_temp_dir}/nginx.d/${vhost}-800-${name}-999-ssl":
+  #    ensure  => $ensure_real,
+  #    content => template('nginx/vhost/vhost_location_footer.erb')
+  #  }
+  #  }
   }
 }
